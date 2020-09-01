@@ -6,23 +6,25 @@ from collections import deque
 import numpy as np
 from itertools import combinations
 
-def import_ChemCad(comps, base_url=None, extract_single_props=None,
-                   extract_coeff_props=None, suffix='Props.txt'):
+extract_single_props = {'Molecular Weight' : 'Mw',
+                        'Critical Temperature' : 'Tc',
+                        'Critical Pressure' : 'Pc',
+                        'Critical Volume' : 'Vc',
+                        'Acentric factor' : 'w',
+                        'Normal boiling point' : 'Tb',
+                        'Heat of vaporization' : 'Hvap'}
+
+extract_coeff_props={'Vapor Pressure' : 'Pvap',
+                     'Ideal Gas Heat Capacity' : 'CpIG',
+                     'Liquid Heat Capacity' : 'CpL',
+                     'Solid Heat Capacity' : 'CpS',
+                     'Heat of Vaporization' : 'Hvap'}
+base_url = 'https://raw.githubusercontent.com/profteachkids/CHE2064/master/data/'
+
+def import_ChemCad(comps, base_url=base_url, extract_single_props=extract_single_props,
+                   extract_coeff_props=extract_coeff_props, suffix='Props.txt'):
 
     N_comps = len(comps)
-    if base_url is None:
-        base_url = 'https://raw.githubusercontent.com/profteachkids/CHE2064/master/data/'
-
-    if extract_single_props is None:
-        extract_single_props = {'Molecular Weight' : 'Mw',
-                                'Critical Temperature' : 'Tc',
-                                'Critical Pressure' : 'Pc',
-                                'Critical Volume' : 'Vc',
-                                'Acentric factor' : 'w',
-                                'Normal boiling point' : 'Tb',
-                                'Heat of vaporization' : 'Hvap'}
-    if extract_coeff_props is None:
-        extract_coeff_props={'Vapor Pressure' : 'Pvap'}
 
     id_pat = re.compile(r'ID\s+(\d+)')
     formula_pat = re.compile(r'Formula:\s+([A-Z1-9]+)')
@@ -55,13 +57,10 @@ def import_ChemCad(comps, base_url=None, extract_single_props=None,
         props[prop]=values
     return props
 
-#%%
-
-def import_NRTL(ids, data_file=None):
+data_file = 'https://raw.githubusercontent.com/profteachkids/CHE2064/master/data/BinaryNRTL.txt'
+def import_NRTL(ids, data_file=data_file):
 
     N_comps = len(ids)
-    if data_file is None:
-        data_file = 'https://raw.githubusercontent.com/profteachkids/CHE2064/master/data/BinaryNRTL.txt'
     text = requests.get(data_file).text
 
     comps_string = '|'.join(ids)
